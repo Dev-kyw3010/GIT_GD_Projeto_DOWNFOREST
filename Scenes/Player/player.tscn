@@ -1,0 +1,45 @@
+[gd_scene load_steps=8 format=2]
+
+[ext_resource path="res://assets/player/char_red.png" type="Texture" id=1]
+[ext_resource path="res://Scenes/Player/AnimationPlayer/Idle.tres" type="Animation" id=2]
+[ext_resource path="res://Scenes/Player/AnimationPlayer/Run.tres" type="Animation" id=3]
+[ext_resource path="res://scripts/script_player/hero.gd" type="Script" id=4]
+[ext_resource path="res://scripts/script_player/texture.gd" type="Script" id=5]
+
+[sub_resource type="RectangleShape2D" id=1]
+extents = Vector2( 8.5, 12.5 )
+
+[sub_resource type="Animation" id=3]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/path = NodePath("texture:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ 0 ]
+}
+
+[node name="Player" type="KinematicBody2D"]
+script = ExtResource( 4 )
+player_speed = 100
+
+[node name="shape" type="CollisionShape2D" parent="."]
+position = Vector2( 0, 12.5 )
+shape = SubResource( 1 )
+
+[node name="texture" type="Sprite" parent="."]
+texture = ExtResource( 1 )
+hframes = 8
+vframes = 11
+script = ExtResource( 5 )
+
+[node name="anima" type="AnimationPlayer" parent="."]
+autoplay = "Idle"
+anims/Idle = ExtResource( 2 )
+anims/RESET = SubResource( 3 )
+anims/Run = ExtResource( 3 )
