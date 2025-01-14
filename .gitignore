@@ -1,0 +1,28 @@
+# Ignorar arquivos e pastas gerados pela Godot
+.import/
+.godot/
+export/
+*.godot
+*.import
+*.tmp
+
+
+# Ignorar arquivos de configuração do editor
+*.user
+*.sublime-workspace
+*.sublime-project
+
+# Ignorar arquivos de cache
+.cache/
+*.tmp
+
+# Ignorar arquivos de log
+*.log
+
+# Ignorar arquivos de backup
+*~
+*.bak
+
+# Ignorar pastas de build
+build/
+bin/
