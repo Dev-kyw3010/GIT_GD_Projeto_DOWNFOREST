@@ -1,0 +1,9 @@
+[gd_scene format=2]
+
+[node name="bg" type="ParallaxBackground"]
+
+[node name="layer_01" type="ParallaxLayer" parent="."]
+
+[node name="TextureRect" type="TextureRect" parent="layer_01"]
+margin_right = 40.0
+margin_bottom = 40.0
