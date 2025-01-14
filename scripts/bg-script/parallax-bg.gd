@@ -1,0 +1,3 @@
+extends ParallaxBackground
+class_name Background
+
