@@ -1,13 +1,26 @@
-[gd_scene load_steps=8 format=2]
+[gd_scene load_steps=21 format=2]
 
 [ext_resource path="res://assets/player/char_red.png" type="Texture" id=1]
 [ext_resource path="res://Scenes/Player/AnimationPlayer/Idle.tres" type="Animation" id=2]
 [ext_resource path="res://Scenes/Player/AnimationPlayer/Run.tres" type="Animation" id=3]
 [ext_resource path="res://scripts/script_player/hero.gd" type="Script" id=4]
 [ext_resource path="res://scripts/script_player/texture.gd" type="Script" id=5]
+[ext_resource path="res://Scenes/Player/AnimationPlayer/jump.tres" type="Animation" id=6]
+[ext_resource path="res://Scenes/Player/AnimationPlayer/Landing.tres" type="Animation" id=7]
+[ext_resource path="res://Scenes/Player/AnimationPlayer/fall.tres" type="Animation" id=8]
+[ext_resource path="res://Scenes/Player/AnimationPlayer/attack_left.tres" type="Animation" id=9]
+[ext_resource path="res://Scenes/Player/AnimationPlayer/crouch.tres" type="Animation" id=10]
+[ext_resource path="res://Scenes/Player/AnimationPlayer/attack_right.tres" type="Animation" id=11]
+[ext_resource path="res://Scenes/Player/AnimationPlayer/shield.tres" type="Animation" id=12]
+[ext_resource path="res://Scenes/Player/AnimationPlayer/wall_slide.tres" type="Animation" id=13]
+[ext_resource path="res://assets/effect/light.png" type="Texture" id=14]
+[ext_resource path="res://Scenes/Player/effects/light_effect.tres" type="Animation" id=15]
+[ext_resource path="res://scripts/script_player/player_stats.gd" type="Script" id=16]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 8.5, 12.5 )
+
+[sub_resource type="RectangleShape2D" id=5]
 
 [sub_resource type="Animation" id=3]
 length = 0.001
@@ -23,12 +36,93 @@ tracks/0/keys = {
 "update": 1,
 "values": [ 0 ]
 }
+tracks/1/type = "value"
+tracks/1/path = NodePath("HitBox/shape:shape")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ SubResource( 5 ) ]
+}
+tracks/2/type = "value"
+tracks/2/path = NodePath("HitBox/shape:shape:extents")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ Vector2( 10, 10 ) ]
+}
+tracks/3/type = "value"
+tracks/3/path = NodePath("HitBox/shape:position")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ Vector2( 0, 0 ) ]
+}
+tracks/4/type = "value"
+tracks/4/path = NodePath("HitBox/shape:disabled")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ true ]
+}
+
+[sub_resource type="Animation" id=6]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/path = NodePath(".:texture_scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ 0.3 ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath(".:energy")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ 0.8 ]
+}
 
 [node name="Player" type="KinematicBody2D"]
 script = ExtResource( 4 )
 player_speed = 100
+jump_speed = -150
+player_gravity = 300
+wall_jump_speed = -150
+wall_gravity = 115
+wall_impulse_speed = 500
 
 [node name="shape" type="CollisionShape2D" parent="."]
+visible = false
 position = Vector2( 0, 12.5 )
 shape = SubResource( 1 )
 
@@ -37,9 +131,56 @@ texture = ExtResource( 1 )
 hframes = 8
 vframes = 11
 script = ExtResource( 5 )
+animation = NodePath("../anima")
+player = NodePath("..")
 
 [node name="anima" type="AnimationPlayer" parent="."]
 autoplay = "Idle"
 anims/Idle = ExtResource( 2 )
+anims/Landing = ExtResource( 7 )
 anims/RESET = SubResource( 3 )
 anims/Run = ExtResource( 3 )
+anims/attack_left = ExtResource( 9 )
+anims/attack_right = ExtResource( 11 )
+anims/crouch = ExtResource( 10 )
+anims/fall = ExtResource( 8 )
+anims/jump = ExtResource( 6 )
+anims/shield = ExtResource( 12 )
+anims/wall_slide = ExtResource( 13 )
+
+[node name="cam" type="Camera2D" parent="."]
+visible = false
+current = true
+limit_left = 0
+limit_top = 0
+drag_margin_h_enabled = true
+drag_margin_v_enabled = true
+
+[node name="HitBox" type="Area2D" parent="."]
+
+[node name="shape" type="CollisionShape2D" parent="HitBox"]
+shape = SubResource( 5 )
+disabled = true
+
+[node name="wall_ray" type="RayCast2D" parent="."]
+enabled = true
+cast_to = Vector2( 6, 0 )
+__meta__ = {
+"_editor_description_": "Node que serve para identificar as paredes do game ."
+}
+
+[node name="luz" type="Light2D" parent="."]
+texture = ExtResource( 14 )
+texture_scale = 0.3
+color = Color( 1, 1, 2, 1 )
+energy = 0.8
+
+[node name="anima_luz" type="AnimationPlayer" parent="luz"]
+autoplay = "light_effect"
+anims/RESET = SubResource( 6 )
+anims/light_effect = ExtResource( 15 )
+
+[node name="Stats" type="Node" parent="."]
+script = ExtResource( 16 )
+
+[connection signal="animation_finished" from="anima" to="texture" method="_animation_finished"]
