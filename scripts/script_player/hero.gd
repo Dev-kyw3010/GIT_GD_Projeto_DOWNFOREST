@@ -1,9 +1,9 @@
 extends KinematicBody2D
 class_name Hero
 
-onready var player : Sprite = get_node("texture")
-onready var wallray : RayCast2D = get_node("wall_ray")
-
+onready var player : Sprite = get_node("texture") # referencia a Sprite
+onready var wallray : RayCast2D = get_node("wall_ray") # referencia ao RayCast2D
+onready var stats : Node = get_node("Stats") # referencia ao Node
 var velocity : Vector2 # Vector2(x,y)
 
 var jump_count : int = 0
@@ -26,6 +26,10 @@ var direcao : int = 1 # por padrão , começa olhando para a direita
 export(int) var wall_jump_speed # velocidade do pulo na parede
 export(int) var wall_gravity # gravidade do wallslide
 export(int) var wall_impulse_speed # impulso da parede
+
+# ON_HIT e DEAD
+var on_hit : bool = false
+var dead : bool = false
 func _physics_process(delta):
 	
 	horizontal_movement_env()
@@ -89,22 +93,26 @@ func crouch() -> void:
 	# Ativando o crouch
 	if Input.is_action_pressed("D_move") and is_on_floor() and not defending:
 		crouching = true
+		stats.shielding = false
 		can_track_input = false
 	# Desativando o crouch
 	elif not defending:
 		crouching = false
 		can_track_input = true
+		stats.shielding = false
 		player.crouching_off = true
 	
 func defense() -> void:
 	# Ativando o crouch
 	if Input.is_action_pressed("shield") and is_on_floor() and not crouching:
 		defending = true
+		stats.shielding = true
 		can_track_input = false
 	# Desativando o crouch
 	elif not crouching:
 		defending = false
 		can_track_input = true
+		stats.shielding = false
 		player.shield_off = true	
 
 # Components : WallSlide

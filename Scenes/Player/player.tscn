@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=2]
+[gd_scene load_steps=23 format=2]
 
 [ext_resource path="res://assets/player/char_red.png" type="Texture" id=1]
 [ext_resource path="res://Scenes/Player/AnimationPlayer/Idle.tres" type="Animation" id=2]
@@ -16,6 +16,8 @@
 [ext_resource path="res://assets/effect/light.png" type="Texture" id=14]
 [ext_resource path="res://Scenes/Player/effects/light_effect.tres" type="Animation" id=15]
 [ext_resource path="res://scripts/script_player/player_stats.gd" type="Script" id=16]
+[ext_resource path="res://Scenes/Player/AnimationPlayer/dead.tres" type="Animation" id=17]
+[ext_resource path="res://Scenes/Player/AnimationPlayer/hit.tres" type="Animation" id=18]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 8.5, 12.5 )
@@ -121,11 +123,6 @@ wall_jump_speed = -150
 wall_gravity = 115
 wall_impulse_speed = 500
 
-[node name="shape" type="CollisionShape2D" parent="."]
-visible = false
-position = Vector2( 0, 12.5 )
-shape = SubResource( 1 )
-
 [node name="texture" type="Sprite" parent="."]
 texture = ExtResource( 1 )
 hframes = 8
@@ -133,6 +130,12 @@ vframes = 11
 script = ExtResource( 5 )
 animation = NodePath("../anima")
 player = NodePath("..")
+attack_collision = NodePath("../HitBox/shape")
+
+[node name="shape" type="CollisionShape2D" parent="."]
+visible = false
+position = Vector2( 0, 12.5 )
+shape = SubResource( 1 )
 
 [node name="anima" type="AnimationPlayer" parent="."]
 autoplay = "Idle"
@@ -143,7 +146,9 @@ anims/Run = ExtResource( 3 )
 anims/attack_left = ExtResource( 9 )
 anims/attack_right = ExtResource( 11 )
 anims/crouch = ExtResource( 10 )
+anims/dead = ExtResource( 17 )
 anims/fall = ExtResource( 8 )
+anims/hit = ExtResource( 18 )
 anims/jump = ExtResource( 6 )
 anims/shield = ExtResource( 12 )
 anims/wall_slide = ExtResource( 13 )
@@ -159,6 +164,7 @@ drag_margin_v_enabled = true
 [node name="HitBox" type="Area2D" parent="."]
 
 [node name="shape" type="CollisionShape2D" parent="HitBox"]
+visible = false
 shape = SubResource( 5 )
 disabled = true
 
@@ -182,5 +188,18 @@ anims/light_effect = ExtResource( 15 )
 
 [node name="Stats" type="Node" parent="."]
 script = ExtResource( 16 )
+player = NodePath("..")
+collision_area = NodePath("../collision_area")
+
+[node name="InvencibilityTimer" type="Timer" parent="Stats"]
+one_shot = true
+
+[node name="collision_area" type="Area2D" parent="."]
+
+[node name="colision" type="CollisionShape2D" parent="collision_area"]
+position = Vector2( 0, 12.5 )
+shape = SubResource( 1 )
 
 [connection signal="animation_finished" from="anima" to="texture" method="_animation_finished"]
+[connection signal="timeout" from="Stats/InvencibilityTimer" to="Stats" method="_on_InvencibilityTimer_timeout"]
+[connection signal="area_entered" from="collision_area" to="Stats" method="_on_collision_area_entered"]

@@ -1,6 +1,8 @@
 extends Sprite
 class_name TextureHero
 
+# Reiniciando a cena após morrer
+signal game_over
 var normal_attack : bool = false
 var suffix : String = "_right"
 var shield_off : bool = false
@@ -8,10 +10,12 @@ var crouching_off : bool = false
 # Usando o AnimationPlayer
 export(NodePath) onready var animation = get_node(animation) as AnimationPlayer
 export(NodePath) onready var player = get_node(player) as KinematicBody2D
-
+export(NodePath) onready var attack_collision = get_node(attack_collision) as CollisionShape2D #  ref HitBox
 func Manager_Animations(direction : Vector2) -> void:
 	verify_flip(direction)
-	if player.attacking or player.defending or player.crouching or player.next_to_wall():
+	if player.on_hit or player.dead:
+		hit_anima()
+	elif player.attacking or player.defending or player.crouching or player.next_to_wall():
 		actions_anima()
 	elif direction.y != 0:
 		vertical_anima(direction)
@@ -63,6 +67,15 @@ func actions_anima() -> void :
 	elif player.crouching and crouching_off:
 		animation.play("crouch")
 		crouching_off = false
+		
+func hit_anima() -> void:
+	player.set_physics_process(false)
+	if player.dead :
+		animation.play("dead")
+		attack_collision.set_deferred("disabled", true)
+	elif player.on_hit:
+		animation.play("hit")
+		
 func _animation_finished(anim_name : String):
 	match anim_name:
 		"Landing" :
@@ -75,3 +88,15 @@ func _animation_finished(anim_name : String):
 		"attack_right":
 			player.attacking = false
 			normal_attack = false
+		"hit":
+			player.on_hit = false
+			player.set_physics_process(true)
+			
+			# Verificação
+			if player.defending:
+				animation.play("shield")
+			
+			if player.crouching :
+				animation.play("crouch")
+		"dead":
+			emit_signal("game_over")
