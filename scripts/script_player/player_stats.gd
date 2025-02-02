@@ -84,13 +84,13 @@ func update_health(type : String , value : int) -> void:
 				current_vida = max_vida
 			
 		"Decrease": # tirando vida
-			verify_shield(value)
+			verify_shield(value) # Calcula o dano sofrido - o valor de defesa
 			
 			if current_vida <= 0:
 				player.dead = true # animation dead
 			else:
 				player.on_hit = true # animation hit
-				player.attacking = false
+				player.attacking = false # impede o ataque
 func verify_shield(value:int) ->void:
 	if shielding:
 		if (base_defense + bonus_defense) > value:

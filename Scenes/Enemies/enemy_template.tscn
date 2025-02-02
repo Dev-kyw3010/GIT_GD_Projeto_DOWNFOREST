@@ -1,0 +1,42 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://scripts/enemy-script/detection_area.gd" type="Script" id=1]
+[ext_resource path="res://scripts/enemy-script/enemy.gd" type="Script" id=2]
+
+[node name="EnemyTemplate" type="KinematicBody2D"]
+script = ExtResource( 2 )
+
+[node name="Texture" type="Sprite" parent="."]
+
+[node name="colisor" type="CollisionShape2D" parent="."]
+
+[node name="DetectionArea" type="Area2D" parent="."]
+script = ExtResource( 1 )
+__meta__ = {
+"_editor_description_": "Essa área serve para identificar quando o personagem entrar em colisão com o inimigo. Essa área de detecção também servirá para o inimigo seguir o personagem durante todo o confronto na cena."
+}
+enemy = NodePath("..")
+
+[node name="shape" type="CollisionShape2D" parent="DetectionArea"]
+
+[node name="CollisionArea" type="Area2D" parent="."]
+__meta__ = {
+"_editor_description_": "Area da HitBox do personagem
+"
+}
+
+[node name="shape" type="CollisionShape2D" parent="CollisionArea"]
+
+[node name="AttackArea" type="Area2D" parent="."]
+__meta__ = {
+"_editor_description_": "area de ataque do inimigo"
+}
+
+[node name="shape" type="CollisionShape2D" parent="AttackArea"]
+
+[node name="Animation" type="AnimationPlayer" parent="."]
+
+[node name="FloorRay" type="RayCast2D" parent="."]
+
+[connection signal="body_entered" from="DetectionArea" to="DetectionArea" method="_on_body_entered"]
+[connection signal="body_exited" from="DetectionArea" to="DetectionArea" method="_on_body_exited"]
